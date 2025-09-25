@@ -4,11 +4,9 @@
 const fetch = require('node-fetch');
 
 // --- 1. CONFIGURATION ---
-// IMPORTANT: Add your API key as an "Environment Variable" in your Vercel project settings.
-// Name the variable: ALPHA_VANTAGE_API_KEY
 const API_KEY = process.env.ALPHA_VANTAGE_API_KEY;
 
-// REDUCED LIST FOR TESTING - This will run much faster and avoid timeouts.
+// REDUCED LIST FOR TESTING
 const SYMBOLS = [
     'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA', 'NVDA', 'META', 'SBUX', 'NKE', 'DIS'
 ];
@@ -18,17 +16,17 @@ let cachedData = {
     timestamp: 0,
     stocks: []
 };
-
-const CACHE_DURATION_MS = 12 * 60 * 60 * 1000; // 12 hours
+const CACHE_DURATION_MS = 12 * 60 * 60 * 1000;
 
 // --- 3. CORE LOGIC ---
 async function fetchStockData() {
-    console.log("Fetching fresh stock data from API for the reduced list...");
+    console.log("Attempting to fetch fresh stock data...");
     if (!API_KEY) {
-        console.error("API Key is not configured in Vercel Environment Variables.");
-        return; // Stop execution if key is missing
+        console.error("CRITICAL: ALPHA_VANTAGE_API_KEY environment variable is NOT SET.");
+        return; 
     }
-    
+    console.log("API Key is present.");
+
     const fetchedStocks = [];
     const stockNameMap = {
         'AAPL': 'Apple Inc.', 'MSFT': 'Microsoft Corp.', 'GOOGL': 'Alphabet Inc.', 
@@ -46,37 +44,35 @@ async function fetchStockData() {
             if (quote && quote['01. symbol']) {
                 console.log(`Successfully fetched ${symbol}`);
                 fetchedStocks.push({
-                    symbol: quote['01. symbol'],
-                    name: stockNameMap[quote['01. symbol']] || `${quote['01. symbol']} Name`,
-                    price: parseFloat(quote['05. price']),
-                    change: parseFloat(quote['09. change']),
-                    changePercent: quote['10. change percent'],
-                    link: `https://www.tradingview.com/chart/?symbol=NASDAQ%3A${quote['01. symbol']}`
+                    symbol: quote['01. symbol'], name: stockNameMap[quote['01. symbol']] || `${quote['01. symbol']} Name`,
+                    price: parseFloat(quote['05. price']), change: parseFloat(quote['09. change']),
+                    changePercent: quote['10. change percent'], link: `https://www.tradingview.com/chart/?symbol=NASDAQ%3A${quote['01. symbol']}`
                 });
-            } else if (data.Note) {
-                console.warn(`API limit likely reached. Pausing for 60 seconds.`);
-                await new Promise(resolve => setTimeout(resolve, 60000));
-                // In a short list, we can just log and continue.
             } else {
-                console.warn(`No data for symbol: ${symbol}. Response: `, data);
+                // Log Alpha Vantage's response if it's not a valid quote
+                console.warn(`Could not get quote for ${symbol}. API Response:`, JSON.stringify(data));
+                if (data.Note) { console.warn("This may be an API rate limit issue."); }
+                if (data["Error Message"]) { console.warn("This may be an invalid API key or symbol issue."); }
             }
         } catch (error) {
             console.error(`Error fetching ${symbol}:`, error);
         }
-        // Wait a bit to be kind to the API, but not as long as before.
         await new Promise(resolve => setTimeout(resolve, 1000));
     }
     
+    if (fetchedStocks.length === 0) {
+        console.error("Warning: Finished fetching, but the stock list is empty. This usually indicates a problem with the API key or reaching the API limit.");
+    }
+
     cachedData = {
         timestamp: Date.now(),
         stocks: fetchedStocks
     };
-    console.log("Finished fetching data for the reduced list.");
+    console.log(`Finished fetching. Found ${fetchedStocks.length} stocks.`);
 }
 
 // --- 4. THE HANDLER ---
 module.exports = async (req, res) => {
-    // Allow requests from any origin
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET');
 
@@ -87,10 +83,6 @@ module.exports = async (req, res) => {
         console.log("Serving data from cache.");
     }
     
-    if (cachedData.stocks.length > 0) {
-        res.status(200).json(cachedData);
-    } else {
-        res.status(503).json({ error: "Could not retrieve stock data. Check the server logs in Vercel.", stocks: [] });
-    }
+    res.status(200).json(cachedData);
 };
 
