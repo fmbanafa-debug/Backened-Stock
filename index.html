@@ -26,6 +26,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            z-index: 10;
         }
         h1 {
             color: #1a237e;
@@ -84,6 +85,7 @@
             font-size: 18px;
             color: #333;
             display: none; /* Hidden by default */
+            text-align: center;
         }
     </style>
 </head>
@@ -101,7 +103,6 @@
 </div>
 
 <script>
-    // The backend API URL will be relative to the domain Vercel hosts it on.
     const API_URL = '/api/stocks';
 
     const canvas = document.getElementById('stockCanvas');
@@ -111,7 +112,7 @@
     const statusOverlay = document.getElementById('statusOverlay');
 
     // --- State Variables ---
-    let stockData = []; // This will be filled from the API
+    let stockData = [];
     let filteredData = [];
     let scrollTop = 0;
     let currentSort = { column: 'symbol', direction: 'asc' };
@@ -125,18 +126,10 @@
     const FONT_SIZE_HEADER = 15;
     const SCROLLBAR_WIDTH = 15;
     const COLORS = {
-        HEADER_BG: '#3f51b5',
-        HEADER_TEXT: '#ffffff',
-        ROW_EVEN_BG: '#f8f9fa',
-        ROW_HOVER_BG: '#e9ecef',
-        TEXT: '#333333',
-        LINK: '#1a237e',
-        POSITIVE: '#2e7d32',
-        NEGATIVE: '#c62828',
-        NEUTRAL: '#555555',
-        BORDER: '#e0e0e0',
-        SCROLLBAR_BG: '#e0e0e0',
-        SCROLLBAR_HANDLE: '#9e9e9e'
+        HEADER_BG: '#3f51b5', HEADER_TEXT: '#ffffff', ROW_EVEN_BG: '#f8f9fa',
+        ROW_HOVER_BG: '#e9ecef', TEXT: '#333333', LINK: '#1a237e',
+        POSITIVE: '#2e7d32', NEGATIVE: '#c62828', NEUTRAL: '#555555',
+        BORDER: '#e0e0e0', SCROLLBAR_BG: '#e0e0e0', SCROLLBAR_HANDLE: '#9e9e9e'
     };
     
     const columns = [
@@ -147,12 +140,11 @@
         { key: 'changePercent', label: '% Change', width: 0.15, align: 'center' }
     ];
 
-    // --- Core Drawing Function ---
     function draw() {
-        if (!canvas) return;
+        if (!ctx) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        // --- Draw Header ---
+        // Draw Header
         ctx.fillStyle = COLORS.HEADER_BG;
         ctx.fillRect(0, 0, canvas.width, HEADER_HEIGHT);
         ctx.font = `bold ${FONT_SIZE_HEADER}px Arial`;
@@ -161,35 +153,30 @@
         let currentX = 0;
         columns.forEach(col => {
             const colWidth = col.width * (canvas.width - SCROLLBAR_WIDTH);
-            const labelText = col.label;
+            const labelText = col.label + (col.key === currentSort.column ? (currentSort.direction === 'asc' ? ' ▲' : ' ▼') : '');
             const textWidth = ctx.measureText(labelText).width;
             let textX = currentX + PADDING;
             if (col.align === 'center') textX = currentX + (colWidth / 2) - (textWidth / 2);
             else if (col.align === 'right') textX = currentX + colWidth - PADDING - textWidth;
             ctx.fillText(labelText, textX, HEADER_HEIGHT / 2);
-            if (col.key === currentSort.column) {
-                const arrow = currentSort.direction === 'asc' ? '▲' : '▼';
-                ctx.fillText(arrow, textX + textWidth + 8, HEADER_HEIGHT / 2);
-            }
             currentX += colWidth;
         });
 
-        // --- Draw Rows ---
+        // Draw Rows
         const startIndex = Math.floor(scrollTop / ROW_HEIGHT);
         const endIndex = Math.min(startIndex + Math.ceil(canvas.height / ROW_HEIGHT), filteredData.length);
         ctx.font = `${FONT_SIZE_BODY}px Arial`;
         for (let i = startIndex; i < endIndex; i++) {
             const stock = filteredData[i];
             const y = HEADER_HEIGHT + (i * ROW_HEIGHT) - scrollTop;
-            if (i === hoverRowIndex) {
-                 ctx.fillStyle = COLORS.ROW_HOVER_BG;
-                 ctx.fillRect(0, y, canvas.width - SCROLLBAR_WIDTH, ROW_HEIGHT);
-            } else if (i % 2 === 0) {
-                ctx.fillStyle = COLORS.ROW_EVEN_BG;
-                ctx.fillRect(0, y, canvas.width - SCROLLBAR_WIDTH, ROW_HEIGHT);
-            }
+            if (i === hoverRowIndex) ctx.fillStyle = COLORS.ROW_HOVER_BG;
+            else if (i % 2 !== 0) ctx.fillStyle = COLORS.ROW_EVEN_BG;
+            else ctx.fillStyle = '#ffffff'; // Default white background
+            ctx.fillRect(0, y, canvas.width - SCROLLBAR_WIDTH, ROW_HEIGHT);
+
             ctx.fillStyle = COLORS.BORDER;
-            ctx.fillRect(0, y + ROW_HEIGHT, canvas.width - SCROLLBAR_WIDTH, 1);
+            ctx.fillRect(0, y + ROW_HEIGHT -1, canvas.width - SCROLLBAR_WIDTH, 1);
+            
             let xPos = 0;
             columns.forEach(col => {
                 const colWidth = col.width * (canvas.width - SCROLLBAR_WIDTH);
@@ -197,6 +184,7 @@
                 if (text === null || text === undefined) text = 'N/A';
                 if (col.key === 'price' && typeof text === 'number') text = `$${text.toFixed(2)}`;
                 if (col.key === 'change' && typeof text === 'number') text = text.toFixed(2);
+                
                 ctx.fillStyle = COLORS.TEXT;
                 if (col.key === 'symbol' && stock.link) ctx.fillStyle = COLORS.LINK;
                 if (['change', 'changePercent'].includes(col.key)) {
@@ -205,6 +193,7 @@
                     else if (changeValue < 0) ctx.fillStyle = COLORS.NEGATIVE;
                     else ctx.fillStyle = COLORS.NEUTRAL;
                 }
+                
                 let textX = xPos + PADDING;
                 const textWidth = ctx.measureText(String(text)).width;
                 if(col.align === 'center') textX = xPos + (colWidth / 2) - (textWidth / 2);
@@ -220,18 +209,19 @@
         const contentHeight = filteredData.length * ROW_HEIGHT;
         const viewableHeight = canvas.height - HEADER_HEIGHT;
         if (contentHeight <= viewableHeight) return;
+        
         const scrollbarTrackHeight = canvas.height - HEADER_HEIGHT;
         const scrollbarHandleHeight = Math.max(20, (viewableHeight / contentHeight) * scrollbarTrackHeight);
         const maxScroll = contentHeight - viewableHeight;
         const scrollPercentage = scrollTop / maxScroll;
         const scrollbarHandleY = HEADER_HEIGHT + scrollPercentage * (scrollbarTrackHeight - scrollbarHandleHeight);
+        
         ctx.fillStyle = COLORS.SCROLLBAR_BG;
         ctx.fillRect(canvas.width - SCROLLBAR_WIDTH, HEADER_HEIGHT, SCROLLBAR_WIDTH, scrollbarTrackHeight);
         ctx.fillStyle = COLORS.SCROLLBAR_HANDLE;
         ctx.fillRect(canvas.width - SCROLLBAR_WIDTH, scrollbarHandleY, SCROLLBAR_WIDTH, scrollbarHandleHeight);
     }
     
-    // --- Data Manipulation ---
     async function fetchAndUpdateData() {
         console.log("Requesting data from backend...");
         showStatus("Fetching Live Data...");
@@ -239,16 +229,24 @@
         updateButton.textContent = 'Updating...';
         try {
             const response = await fetch(API_URL);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
             const data = await response.json();
-            stockData = data.stocks || [];
-            handleSearch(); // This will filter, sort, and draw
+            if (!response.ok) {
+                throw new Error(`The server responded with status: ${response.status}`);
+            }
+            if (data.error) {
+                throw new Error(`Server error: ${data.error}`);
+            }
+            // NEW: Check if the returned stocks array is empty
+            if (!data.stocks || data.stocks.length === 0) {
+                 throw new Error("Backend returned an empty list. This may be due to an invalid API key or API rate limits. Check the Vercel server logs.");
+            }
+
+            stockData = data.stocks;
+            handleSearch();
             showStatus(`Data updated: ${new Date(data.timestamp).toLocaleTimeString()}`, 3000);
         } catch (error) {
             console.error("Failed to fetch stock data:", error);
-            showStatus('Error: Could not fetch data.', 5000);
+            showStatus(`<strong>Error: Could not display data.</strong><br><small>${error.message}</small>`, 10000);
         } finally {
             updateButton.disabled = false;
             updateButton.textContent = 'Update Prices';
@@ -256,22 +254,19 @@
     }
 
     function showStatus(message, duration = 0) {
-        statusOverlay.textContent = message;
+        statusOverlay.innerHTML = message;
         statusOverlay.style.display = 'block';
         if (duration > 0) {
-            setTimeout(() => {
-                statusOverlay.style.display = 'none';
-            }, duration);
+            setTimeout(() => { statusOverlay.style.display = 'none'; }, duration);
         }
     }
 
-    // --- Interaction and Event Handlers ---
     function handleSearch() {
         const filter = searchInput.value.toUpperCase();
-        filteredData = stockData.filter(stock => {
-            return (stock.symbol && stock.symbol.toUpperCase().includes(filter)) || 
-                   (stock.name && stock.name.toUpperCase().includes(filter));
-        });
+        filteredData = stockData.filter(stock => 
+            (stock.symbol && stock.symbol.toUpperCase().includes(filter)) || 
+            (stock.name && stock.name.toUpperCase().includes(filter))
+        );
         scrollTop = 0;
         sortData();
     }
@@ -279,12 +274,10 @@
     function sortData() {
         filteredData.sort((a, b) => {
             const col = currentSort.column;
-            let valA = a[col];
-            let valB = b[col];
-            const numericColumns = ['price', 'change', 'changePercent'];
-            if (numericColumns.includes(col)) {
-                valA = (valA === null) ? -Infinity : parseFloat(String(valA).replace('%',''));
-                valB = (valB === null) ? -Infinity : parseFloat(String(valB).replace('%',''));
+            let valA = a[col], valB = b[col];
+            if (['price', 'change'].includes(col) || (col === 'changePercent' && typeof valA === 'string')) {
+                valA = parseFloat(String(valA).replace('%',''));
+                valB = parseFloat(String(valB).replace('%',''));
             } else {
                 valA = String(valA || '').toLowerCase();
                 valB = String(valB || '').toLowerCase();
@@ -296,16 +289,11 @@
         draw();
     }
     
-    function handleClick(e) { /* ... same as before ... */ }
-    function handleMouseMove(e) { /* ... same as before ... */ }
-    function handleMouseWheel(e) { /* ... same as before ... */ }
-
-    // Re-paste existing handlers to avoid losing them
     function handleClick(e) {
         const rect = canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        if (y <= HEADER_HEIGHT) {
+        if (y <= HEADER_HEIGHT && x < canvas.width - SCROLLBAR_WIDTH) {
             let currentX = 0;
             for (const col of columns) {
                 const colWidth = col.width * (canvas.width - SCROLLBAR_WIDTH);
@@ -321,38 +309,19 @@
                 }
                 currentX += colWidth;
             }
-            return;
-        }
-        const rowIndex = Math.floor((y - HEADER_HEIGHT + scrollTop) / ROW_HEIGHT);
-        if (rowIndex >= 0 && rowIndex < filteredData.length) {
-            const stock = filteredData[rowIndex];
-            const symbolColWidth = columns[0].width * (canvas.width - SCROLLBAR_WIDTH);
-            if (x < symbolColWidth && stock.link) {
-                window.open(stock.link, '_blank');
-            }
         }
     }
 
     function handleMouseMove(e) {
         const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        let cursor = 'default';
         hoverRowIndex = -1;
-        if (y <= HEADER_HEIGHT) {
-            cursor = 'pointer';
-        } 
-        else if (x < canvas.width - SCROLLBAR_WIDTH) {
+        if (y > HEADER_HEIGHT) {
             const rowIndex = Math.floor((y - HEADER_HEIGHT + scrollTop) / ROW_HEIGHT);
             if (rowIndex >= 0 && rowIndex < filteredData.length) {
                 hoverRowIndex = rowIndex;
-                const symbolColWidth = columns[0].width * (canvas.width - SCROLLBAR_WIDTH);
-                if (x < symbolColWidth && filteredData[rowIndex].link) {
-                    cursor = 'pointer';
-                }
             }
         }
-        canvas.style.cursor = cursor;
         draw();
     }
     
@@ -364,7 +333,6 @@
         draw();
     }
 
-    // --- Setup and Initialization ---
     function resizeCanvas() {
         const container = document.getElementById('canvasContainer');
         canvas.width = container.clientWidth;
@@ -372,22 +340,18 @@
         draw();
     }
     
-    // --- Initial setup ---
     window.addEventListener('resize', resizeCanvas);
     searchInput.addEventListener('keyup', handleSearch);
     updateButton.addEventListener('click', fetchAndUpdateData);
     canvas.addEventListener('click', handleClick);
     canvas.addEventListener('wheel', handleMouseWheel);
     canvas.addEventListener('mousemove', handleMouseMove);
-    canvas.addEventListener('mouseleave', () => {
-        hoverRowIndex = -1;
-        draw();
-    });
+    canvas.addEventListener('mouseleave', () => { hoverRowIndex = -1; draw(); });
 
-    // --- First Load ---
     resizeCanvas();
-    fetchAndUpdateData(); // Fetch data when the page loads for the first time
+    fetchAndUpdateData();
 </script>
 
 </body>
 </html>
+
