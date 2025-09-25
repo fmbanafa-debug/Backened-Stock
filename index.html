@@ -3,120 +3,514 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biotech & Pharma Funding Analysis</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Interactive Stock Watchlist</title>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f9;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        h1 {
+            color: #1a237e;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #searchInput {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        #stockTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #stockTable th, #stockTable td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            text-align: left;
+        }
+        #stockTable th {
+            background-color: #3f51b5;
+            color: white;
+            cursor: pointer;
+            position: relative;
+            user-select: none;
+        }
+        #stockTable th::after {
+            content: '';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.5;
+            border: 5px solid transparent;
+        }
+        #stockTable th.sort-asc::after {
+            border-bottom-color: #fff;
+        }
+        #stockTable th.sort-desc::after {
+            border-top-color: #fff;
+        }
+        #stockTable tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        #stockTable tbody tr:hover {
+            background-color: #e9ecef;
+        }
+        .positive {
+            color: #2e7d32;
+            font-weight: 500;
+        }
+        .negative {
+            color: #c62828;
+            font-weight: 500;
+        }
+        .neutral {
+            color: #555;
+        }
+        a {
+            color: #1a237e;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
-<body class="bg-gray-900 text-gray-100 p-4 sm:p-6 md:p-8">
-    <div class="max-w-4xl mx-auto bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
-        <div class="p-6 sm:p-8">
-            <h1 class="text-3xl sm:text-4xl font-bold text-white mb-2">Biotech & Pharma Funding Analysis</h1>
-            <p class="text-indigo-400 font-medium">Insights from August's Landmark Funding Rounds</p>
-        </div>
+<body>
 
-        <!-- Companies Section -->
-        <div class="p-6 sm:p-8 border-t border-gray-700">
-            <h2 class="text-2xl font-semibold text-white mb-6">Top Funding Rounds in August</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Public Companies -->
-                <div class="bg-gray-700/50 p-6 rounded-xl">
-                    <h3 class="text-xl font-semibold text-white mb-4">Top 5 Public Companies</h3>
-                    <div class="space-y-4">
-                        <!-- QuidelOrtho -->
-                        <div class="flex items-center justify-between bg-gray-800 p-3 rounded-lg">
-                            <a href="https://www.google.com/finance/quote/QDEL:NASDAQ" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 group">
-                                <img src="https://logo.clearbit.com/quidelortho.com" alt="QuidelOrtho Logo" class="w-8 h-8 rounded-full" onerror="this.onerror=null;this.src='https://placehold.co/40x40/1F2937/FFFFFF?text=QO';">
-                                <span class="font-medium text-white group-hover:text-indigo-400 transition-colors">QuidelOrtho</span>
-                            </a>
-                            <span class="font-bold text-lg text-green-400">$3.4B</span>
-                        </div>
-                        <!-- Sarepta -->
-                        <div class="flex items-center justify-between bg-gray-800 p-3 rounded-lg">
-                            <a href="https://www.google.com/finance/quote/SRPT:NASDAQ" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 group">
-                                <img src="https://logo.clearbit.com/sarepta.com" alt="Sarepta Logo" class="w-8 h-8" onerror="this.onerror=null;this.src='https://placehold.co/40x40/1F2937/FFFFFF?text=SRPT';">
-                                <span class="font-medium text-white group-hover:text-indigo-400 transition-colors">Sarepta Therapeutics</span>
-                            </a>
-                            <span class="font-bold text-lg text-green-400">$750M</span>
-                        </div>
-                        <!-- MannKind -->
-                        <div class="flex items-center justify-between bg-gray-800 p-3 rounded-lg">
-                             <a href="https://www.google.com/finance/quote/MNKD:NASDAQ" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 group">
-                                <img src="https://logo.clearbit.com/mannkindcorp.com" alt="MannKind Logo" class="w-8 h-8 rounded-full" onerror="this.onerror=null;this.src='https://placehold.co/40x40/1F2937/FFFFFF?text=MK';">
-                                <span class="font-medium text-white group-hover:text-indigo-400 transition-colors">MannKind</span>
-                            </a>
-                            <span class="font-bold text-lg text-green-400">$500M</span>
-                        </div>
-                         <!-- Akeso -->
-                        <div class="flex items-center justify-between bg-gray-800 p-3 rounded-lg">
-                             <a href="https://www.google.com/finance/quote/9926:HKG" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 group">
-                                <img src="https://logo.clearbit.com/akesobio.com" alt="Akeso Bio Logo" class="w-8 h-8 p-1 bg-white rounded-full" onerror="this.onerror=null;this.src='https://placehold.co/40x40/1F2937/FFFFFF?text=AK';">
-                                <span class="font-medium text-white group-hover:text-indigo-400 transition-colors">Akeso Bio</span>
-                            </a>
-                            <span class="font-bold text-lg text-green-400">$449M</span>
-                        </div>
-                    </div>
-                </div>
-                <!-- Private Companies -->
-                <div class="bg-gray-700/50 p-6 rounded-xl">
-                    <h3 class="text-xl font-semibold text-white mb-4">Top 5 Private Companies</h3>
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between bg-gray-800 p-3 rounded-lg"><span class="font-medium">Superluminal</span><span class="font-bold text-lg text-green-400">$1.3B</span></div>
-                        <div class="flex items-center justify-between bg-gray-800 p-3 rounded-lg"><span class="font-medium">Replicate</span><span class="font-bold text-lg text-green-400">$550M</span></div>
-                        <div class="flex items-center justify-between bg-gray-800 p-3 rounded-lg"><span class="font-medium">Kriya</span><span class="font-bold text-lg text-green-400">$313M</span></div>
-                        <div class="flex items-center justify-between bg-gray-800 p-3 rounded-lg"><span class="font-medium">Strand Therapeutics</span><span class="font-bold text-lg text-green-400">$153M</span></div>
-                        <div class="flex items-center justify-between bg-gray-800 p-3 rounded-lg"><span class="font-medium">明⽉医药 (MingYue)</span><span class="font-bold text-lg text-green-400">$131M</span></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="container">
+    <h1>📈 Interactive Stock Watchlist</h1>
+    <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search by stock symbol or name...">
 
-        <!-- Analytical Questions Section -->
-        <div class="p-6 sm:p-8 border-t border-gray-700">
-            <h2 class="text-2xl font-semibold text-white mb-6">Analytical Insights: What to Watch</h2>
-            <div class="space-y-8">
-                <!-- Question 1 -->
-                <div>
-                    <h3 class="text-lg font-semibold text-indigo-300 mb-2">Which areas contributed most?</h3>
-                    <p class="text-gray-300 leading-relaxed">
-                        Funding is diversified across several high-value sectors. <strong class="text-white">Oncology and rare diseases</strong> continue to dominate, exemplified by Sarepta (Duchenne muscular dystrophy) and Akeso (oncology). However, the massive $3.4B for QuidelOrtho underscores the sustained importance of <strong class="text-white">diagnostics</strong> in the post-pandemic era. Additionally, platform technologies like <strong class="text-white">gene therapy, biologics, and novel drug delivery systems</strong> (e.g., MannKind's inhalation tech) are attracting significant capital, indicating investor confidence in foundational science with broad applications.
-                    </p>
-                </div>
-                <!-- Question 2 -->
-                <div>
-                    <h3 class="text-lg font-semibold text-indigo-300 mb-2">Which geographies are leading the pack?</h3>
-                    <p class="text-gray-300 leading-relaxed">
-                        The <strong class="text-white">United States remains the epicenter of biotech funding</strong>, with major hubs like Boston and California housing companies like Sarepta and MannKind. However, <strong class="text-white">China's biotech ecosystem is rapidly maturing and attracting massive investment</strong>, as seen with Akeso Biopharma and MingYue Medical on this list. This highlights a key global trend: while the U.S. leads, Greater China is a formidable and fast-growing second hub, creating a bipolar innovation and investment landscape. European hubs also remain significant contributors to the global pipeline.
-                    </p>
-                </div>
-                <!-- Question 3 -->
-                <div>
-                    <h3 class="text-lg font-semibold text-indigo-300 mb-2">Which companies are using new business models?</h3>
-                    <p class="text-gray-300 leading-relaxed">
-                        Many of these companies exemplify modern biotech business models. <strong class="text-white">Platform-based companies</strong> are a clear trend among the private players like Replicate (self-replicating RNA) and Strand Therapeutics (mRNA). These companies build a core technology that can generate a pipeline of multiple drug candidates, offering a more diversified and scalable model than single-asset companies. Furthermore, the integration of <strong class="text-white">AI and machine learning in drug discovery</strong> is a powerful underlying current, enabling companies to accelerate target identification and de-risk development, making them highly attractive to investors.
-                    </p>
-                </div>
-                <!-- Question 4 -->
-                <div>
-                    <h3 class="text-lg font-semibold text-indigo-300 mb-2">How will these successes shape the future landscape?</h3>
-                    <p class="text-gray-300 leading-relaxed">
-                        These large funding rounds will have significant ripple effects:
-                        <br> • <strong class="text-white">M&A and Strategic Alliances:</strong> Well-capitalized biotechs become more valuable and can negotiate partnerships from a position of strength. Big Pharma, facing patent cliffs, will view these funded companies as prime acquisition targets to bolster their pipelines, likely leading to a competitive M&A environment.
-                        <br> • <strong class="text-white">Funding & Valuations:</strong> Success stories like these inject confidence into the market, potentially attracting more capital to the biotech sector. It validates specific technologies (e.g., RNA, gene therapy) and will likely drive higher valuations for other companies in those spaces with promising data.
-                        <br> • <strong class="text-white">De-risking Innovation:</strong> Securing substantial funding allows these companies to advance their clinical trials and technology platforms aggressively. This de-risks their assets, paving a clearer path to regulatory approval and commercialization, which ultimately benefits the entire innovation ecosystem.
-                    </p>
-                </div>
-            </div>
-        </div>
+    <table id="stockTable">
+        <thead>
+            <tr>
+                <th onclick="sortTable('symbol')">Symbol</th>
+                <th onclick="sortTable('name')">Name</th>
+                <th onclick="sortTable('price')">Price</th>
+                <th onclick="sortTable('change')">Change</th>
+                <th onclick="sortTable('changePercent')">% Change</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            </tbody>
+    </table>
+</div>
 
-        <footer class="text-center p-4 bg-gray-900/50 border-t border-gray-700">
-            <p class="text-xs text-gray-500">Data Source: BiopharmaIQ, inspired by Mayur Harne's post on LinkedIn.</p>
-        </footer>
-    </div>
+<script>
+    const tableData = [
+        {symbol: 'ABEO', name: 'Abeona Therapeutics Inc.', price: 5.38, change: -0.26, changePercent: '-4.61%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AABEO'},
+        {symbol: 'ABVX', name: 'ABVC BioPharma Inc.', price: 82.3, change: -1.01, changePercent: '-1.21%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AABVX'},
+        {symbol: 'ACAD', name: 'ACADIA Pharmaceuticals Inc.', price: 24.42, change: -0.335, changePercent: '-1.35%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AACAD'},
+        {symbol: 'ACB', name: 'Aurora Cannabis Inc.', price: 5.09, change: -0.09, changePercent: '-1.74%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AACB'},
+        {symbol: 'ACHR', name: 'Archer Aviation Inc.', price: 9.86, change: 0.61, changePercent: '6.59%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AACHR'},
+        {symbol: 'ACLX', name: 'Arcellx Inc.', price: 77.86, change: -2.12, changePercent: '-2.65%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AACLX'},
+        {symbol: 'ADAP', name: 'Adaptimmune Therapeutics plc', price: 0.1444, change: -0.0156, changePercent: '-9.75%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AADAP'},
+        {symbol: 'ADV', name: 'Advantage Solutions Inc.', price: 1.77, change: -0.12, changePercent: '-6.35%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AADV'},
+        {symbol: 'AGAE', name: 'Allied Gaming & Entertainment Inc.', price: 1.05, change: 0.04, changePercent: '3.96%', link: 'https://www.tradingview.com/chart/?symbol=NYSEAMERICAN%3AAGAE'},
+        {symbol: 'AGEN', name: 'Agenus Inc.', price: 4.38, change: -0.17, changePercent: '-3.74%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AAGEN'},
+        {symbol: 'AGL', name: 'agilon health inc.', price: 1.16, change: -0.01, changePercent: '-0.85%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AAGL'},
+        {symbol: 'AGNC', name: 'AGNC Investment Corp.', price: 9.97, change: -0.13, changePercent: '-1.29%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AAGNC'},
+        {symbol: 'AI', name: 'C3.ai Inc.', price: 17.9, change: -0.12, changePercent: '-0.67%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AAI'},
+        {symbol: 'AIFF', name: 'Firefly Neuroscience Inc.', price: 2.89, change: -0.08, changePercent: '-2.69%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AAIFF'},
+        {symbol: 'AKO.B', name: 'Aristocratic Brands Corp. (Class B)', price: 24.77, change: -0.32, changePercent: '-1.28%', link: 'https://www.tradingview.com/chart/?symbol=NYSEAMERICAN%3AAKO.B'},
+        {symbol: 'ALAB', name: 'Astera Labs Inc.', price: 245.2, change: -6.68, changePercent: '-2.65%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AALAB'},
+        {symbol: 'AMC', name: 'AMC Entertainment Holdings Inc.', price: 3.01, change: 0.17, changePercent: '5.99%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AAMC'},
+        {symbol: 'AMLX', name: 'Amylyx Pharmaceuticals Inc.', price: 13.31, change: 0.06, changePercent: '0.45%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AAMLX'},
+        {symbol: 'AMPL', name: 'Amplitude Inc.', price: 12.07, change: 0.11, changePercent: '0.92%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AAMPL'},
+        {symbol: 'AMRN', name: 'Amarin Corporation plc', price: 15.35, change: 0.43, changePercent: '2.88%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AAMRN'},
+        {symbol: 'AMRX', name: 'Amneal Pharmaceuticals Inc.', price: 9.81, change: 0.00, changePercent: '0.00%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AAMRX'},
+        {symbol: 'ANTX', name: 'Agenus Inc.', price: 1.32, change: 0.03, changePercent: '2.33%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AANTX'},
+        {symbol: 'APPS', name: 'Digital Turbine Inc.', price: 5.52, change: 0.18, changePercent: '3.37%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AAPPS'},
+        {symbol: 'ARM', name: 'Arm Holdings plc', price: 142.91, change: -3.63, changePercent: '-2.48%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AARM'},
+        {symbol: 'ARQQ', name: 'Arqit Quantum Inc.', price: 41.73, change: 4.33, changePercent: '11.58%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AARQQ'},
+        {symbol: 'ARR', name: 'ARMOUR Residential REIT Inc.', price: 14.59, change: -0.16, changePercent: '-1.08%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AARR'},
+        {symbol: 'ARTL', name: 'Artelo Biosciences Inc.', price: 5.62, change: 0.06, changePercent: '1.08%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AARTL'},
+        {symbol: 'ARVN', name: 'Arvinas Inc.', price: 7.52, change: -0.20, changePercent: '-2.59%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AARVN'},
+        {symbol: 'ASAN', name: 'Asana Inc.', price: 14.2, change: -0.17, changePercent: '-1.18%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AASAN'},
+        {symbol: 'ASST', name: 'Asset Entities Inc.', price: 4.3, change: 0.48, changePercent: '12.57%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AASST'},
+        {symbol: 'ATAT', name: 'Atour Lifestyle Holdings Ltd.', price: 40.08, change: 0.61, changePercent: '1.55%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AATAT'},
+        {symbol: 'ATCH', name: 'Abtech Holdings Inc.', price: 0.917, change: -0.253, changePercent: '-21.62%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AATCH'},
+        {symbol: 'ATHE', name: 'Alterity Therapeutics Ltd.', price: 4.48, change: 0.10, changePercent: '2.28%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AATHE'},
+        {symbol: 'AUPH', name: 'Aurinia Pharmaceuticals Inc.', price: 13, change: 0.11, changePercent: '0.85%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AAUPH'},
+        {symbol: 'AUR', name: 'Authentic Holdings Inc.', price: 6.06, change: 0.10, changePercent: '1.68%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AAUR'},
+        {symbol: 'AVID', name: 'Avid Technology Inc.', price: null, change: null, changePercent: null, link: null},
+        {symbol: 'AVIR', name: 'Aviragen Therapeutics Inc. (Delisted)', price: 2.88, change: -0.09, changePercent: '-3.03%', link: null},
+        {symbol: 'AVXL', name: 'Anavex Life Sciences Corp.', price: 8.46, change: -0.21, changePercent: '-2.42%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AAVXL'},
+        {symbol: 'AYRWF', name: 'Ayr Wellness Inc.', price: 0.0263, change: -0.0022, changePercent: '-7.72%', link: 'https://www.tradingview.com/chart/?symbol=OTCPK%3AAYRWF'},
+        {symbol: 'BAND', name: 'Bandwidth Inc.', price: 17.54, change: -0.54, changePercent: '-2.99%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ABAND'},
+        {symbol: 'BCAX', name: 'BCA Acquisition Corp.', price: 10.44, change: -0.62, changePercent: '-5.61%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ABCAX'},
+        {symbol: 'BCS', name: 'Barclays PLC', price: 20.72, change: -0.29, changePercent: '-1.38%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ABCS'},
+        {symbol: 'BCTCF', name: 'BCB Bancorp Inc.', price: 2.13, change: -0.15, changePercent: '-6.58%', link: 'https://www.tradingview.com/chart/?symbol=OTCPK%3ABCTCF'},
+        {symbol: 'BDRX', name: 'Biodexa Pharmaceuticals PLC', price: 6.61, change: 0.09, changePercent: '1.38%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ABDRX'},
+        {symbol: 'BGMS', name: 'Bio-Gene Technology Ltd.', price: 4.65, change: 0.14, changePercent: '3.10%', link: 'https://www.tradingview.com/chart/?symbol=OTCPK%3ABGMS'},
+        {symbol: 'BHC', name: 'Bausch Health Companies Inc.', price: 6.73, change: -0.16, changePercent: '-2.32%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ABHC'},
+        {symbol: 'BIOA', name: 'BioAfrica Holdings Ltd.', price: 4.9, change: -0.32, changePercent: '-6.13%', link: 'https://www.tradingview.com/chart/?symbol=OTCPK%3ABIOA'},
+        {symbol: 'BKYI', name: 'BIO-key International Inc.', price: 0.775, change: -0.0227, changePercent: '-2.85%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ABKYI'},
+        {symbol: 'BLBX', name: 'Blueberry Therapeutics Inc.', price: 6.74, change: 0.265, changePercent: '4.09%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ABLBX'},
+        {symbol: 'BMBL', name: 'Bumble Inc.', price: 7.05, change: -0.12, changePercent: '-1.67%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ABMBL'},
+        {symbol: 'BNXAF', name: 'Bionexus Gene Solutions Corp.', price: 0.892, change: 0.0146, changePercent: '1.66%', link: 'https://www.tradingview.com/chart/?symbol=OTCPK%3ABNXAF'},
+        {symbol: 'BNZI', name: 'Banza Inc.', price: 2.34, change: -0.13, changePercent: '-5.26%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ABNZI'},
+        {symbol: 'BOF', name: 'BranchOut Food Inc.', price: 2.26, change: -0.05, changePercent: '-2.16%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ABOF'},
+        {symbol: 'BPMC', name: 'Bristol-Myers Squibb Co.', price: 129.46, change: 39.88, changePercent: '44.52%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ABPMC'},
+        {symbol: 'BRPHF', name: 'Breville Group Ltd.', price: 32.87, change: -0.21, changePercent: '-0.63%', link: 'https://www.tradingview.com/chart/?symbol=OTCPK%3ABRPHF'},
+        {symbol: 'BRR', name: 'Broadridge Financial Solutions Inc.', price: 10.13, change: 0.00, changePercent: '0.00%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ABRR'},
+        {symbol: 'BRT', name: 'BRT Apartments Corp.', price: 16.18, change: -0.37, changePercent: '-2.24%', link: 'https://www.tradingview.com/chart/?symbol=NYSEAMERICAN%3ABRT'},
+        {symbol: 'BRY', name: 'Berry Corporation', price: 3.9, change: -0.18, changePercent: '-4.41%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ABRY'},
+        {symbol: 'BUD', name: 'Anheuser-Busch InBev SA/NV', price: 59.36, change: 0.78, changePercent: '1.33%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ABUD'},
+        {symbol: 'CAG', name: 'Conagra Brands Inc.', price: 18.54, change: -0.21, changePercent: '-1.12%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ACAG'},
+        {symbol: 'CAKE', name: 'Cheesecake Factory Inc.', price: 54.58, change: -0.54, changePercent: '-0.98%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ACAKE'},
+        {symbol: 'CDMO', name: 'Avid Bioservices Inc.', price: null, change: null, changePercent: null, link: null},
+        {symbol: 'CELH', name: 'Celsius Holdings Inc.', price: 54.73, change: -0.46, changePercent: '-0.83%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ACELH'},
+        {symbol: 'CEP', name: 'Cantor Equity Partners Inc.', price: 22.34, change: 0.28, changePercent: '1.27%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ACEP'},
+        {symbol: 'CGC', name: 'Canopy Growth Corporation', price: 1.37, change: -0.01, changePercent: '-0.72%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ACGC'},
+        {symbol: 'CLBR', name: 'Colombier Acquisition Corp.', price: 17.24, change: 6.66, changePercent: '62.95%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ACLBR'},
+        {symbol: 'CLM', name: 'Colonial High Income Municipal Trust', price: 8.2, change: -0.01, changePercent: '-0.12%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ACLM'},
+        {symbol: 'CLSK', name: 'Cleanspark Inc.', price: 13.62, change: 0.16, changePercent: '1.19%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ACLSK'},
+        {symbol: 'CMG', name: 'Chipotle Mexican Grill Inc.', price: 39.32, change: -0.49, changePercent: '-1.23%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ACMG'},
+        {symbol: 'CMPS', name: 'Compass Pathways plc', price: 4.9, change: -0.18, changePercent: '-3.54%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ACMPS'},
+        {symbol: 'CMTL', name: 'Comtech Telecommunications Corp.', price: 2.25, change: -0.24, changePercent: '-9.64%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ACMTL'},
+        {symbol: 'CNBS', name: 'VictoryShares Cannabis ETF', price: 27.6603, change: -0.2097, changePercent: '-0.75%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ACNBS'},
+        {symbol: 'COEP', name: 'Coeptis Therapeutics Inc.', price: 13.88, change: 1.33, changePercent: '10.60%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ACOEP'},
+        {symbol: 'COUR', name: 'Coursera Inc.', price: 11.65, change: 0.06, changePercent: '0.52%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ACOUR'},
+        {symbol: 'CPB', name: 'Campbell Soup Company', price: 33.43, change: -0.14, changePercent: '-0.42%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ACPB'},
+        {symbol: 'CPIX', name: "Citizen's Community Bancorp", price: 3.15, change: -0.16, changePercent: '-4.83%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ACPIX'},
+        {symbol: 'CRBU', name: 'Caribou Biosciences Inc.', price: 1.69, change: -0.09, changePercent: '-5.06%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ACRBU'},
+        {symbol: 'CRGY', name: 'Crescent Energy Company', price: 8.41, change: -0.37, changePercent: '-4.21%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ACRGY'},
+        {symbol: 'CRON', name: 'Cronos Group Inc.', price: 2.62, change: -0.05, changePercent: '-1.87%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ACRON'},
+        {symbol: 'CRSP', name: 'CRISPR Therapeutics AG', price: 62.32, change: -0.62, changePercent: '-0.99%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ACRSP'},
+        {symbol: 'CRVS', name: 'Corrus Pharmaceuticals Holdings Inc.', price: 5.87, change: -0.25, changePercent: '-4.08%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ACRVS'},
+        {symbol: 'CSTL', name: 'Castle Biosciences Inc.', price: 24.41, change: 0.95, changePercent: '4.05%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ACSTL'},
+        {symbol: 'CTRN', name: 'Citrus Tower Inc.', price: 32.39, change: -1.56, changePercent: '-4.59%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ACTRN'},
+        {symbol: 'CURLF', name: 'Curlato Holdings Inc.', price: 2.6, change: -0.0057, changePercent: '-0.22%', link: 'https://www.tradingview.com/chart/?symbol=OTCPK%3ACURLF'},
+        {symbol: 'CXDO', name: 'CXApp Inc.', price: 6.97, change: 0.15, changePercent: '2.20%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ACXDO'},
+        {symbol: 'CYTK', name: 'Cytokinetics Inc.', price: 48.66, change: -0.63, changePercent: '-1.28%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ACYTK'},
+        {symbol: 'DARE', name: 'Sharecare Inc.', price: 2.12, change: 0.04, changePercent: '1.92%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ADARE'},
+        {symbol: 'DDC', name: "Dick's Sporting Goods Inc.", price: 10.65, change: -0.40, changePercent: '-3.62%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ADDC'},
+        {symbol: 'DFDV', name: 'Dimensional US Defensive Value ETF', price: 16.93, change: -0.82, changePercent: '-4.62%', link: 'https://www.tradingview.com/chart/?symbol=BATS%3ADFDV'},
+        {symbol: 'DFLI', name: 'Dragonfly Energy Holdings Corp.', price: 0.2821, change: -0.0056, changePercent: '-1.95%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ADFLI'},
+        {symbol: 'DFSC', name: 'Defense Security Group Inc.', price: 3.94, change: 0.49, changePercent: '14.20%', link: 'https://www.tradingview.com/chart/?symbol=OTCPK%3ADFSC'},
+        {symbol: 'DLMAF', name: 'Diamcor Mining Inc.', price: 137.06, change: 0.05, changePercent: '0.04%', link: 'https://www.tradingview.com/chart/?symbol=OTCPK%3ADLMAF'},
+        {symbol: 'DLTR', name: 'Dollar Tree Inc.', price: 95.26, change: -3.00, changePercent: '-3.05%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ADLTR'},
+        {symbol: 'DNA', name: 'Ginkgo Bioworks Holdings Inc.', price: 11.37, change: -0.05, changePercent: '-0.44%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ADNA'},
+        {symbol: 'DRVN', name: 'DriveNxt Inc.', price: 16.62, change: -0.27, changePercent: '-1.60%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ADRVN'},
+        {symbol: 'DYN', name: 'Dyne Therapeutics Inc.', price: 13.13, change: -0.79, changePercent: '-5.68%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ADYN'},
+        {symbol: 'EDRY', name: 'Air T Inc.', price: 12.58, change: -0.42, changePercent: '-3.23%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AEDRY'},
+        {symbol: 'EFC', name: 'Ellington Financial Inc.', price: 13.17, change: -0.06, changePercent: '-0.45%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AEFC'},
+        {symbol: 'EHAB', name: 'Enhabit Inc.', price: 8.18, change: 0.12, changePercent: '1.49%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AEHAB'},
+        {symbol: 'EL', name: 'Estee Lauder Companies Inc.', price: 87.8, change: -0.20, changePercent: '-0.23%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AEL'},
+        {symbol: 'ELF', name: 'e.l.f. Beauty Inc.', price: 139.96, change: -6.71, changePercent: '-4.57%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AELF'},
+        {symbol: 'ENB', name: 'Enbridge Inc.', price: 49.46, change: 0.34, changePercent: '0.69%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AENB'},
+        {symbol: 'ENR', name: 'Energizer Holdings Inc.', price: 28.83, change: -0.70, changePercent: '-2.37%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AENR'},
+        {symbol: 'EOLS', name: 'Evolus Inc.', price: 6.29, change: -0.13, changePercent: '-2.02%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AEOLS'},
+        {symbol: 'EQT', name: 'EQT Corporation', price: 49.19, change: -0.20, changePercent: '-0.40%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AEQT'},
+        {symbol: 'ERNA', name: 'Eterna Therapeutics Inc.', price: 1.33, change: 0.06, changePercent: '4.72%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AERNA'},
+        {symbol: 'ESPR', name: 'Esperion Therapeutics Inc.', price: 2.66, change: -0.09, changePercent: '-3.27%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AESPR'},
+        {symbol: 'ETNB', name: '89bio Inc.', price: 14.87, change: -0.09, changePercent: '-0.60%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AETNB'},
+        {symbol: 'ETRN', name: 'Energyn Inc. (Delisted)', price: null, change: null, changePercent: null, link: null},
+        {symbol: 'EVVAQ', name: 'Enviva Inc. (Bankrupt/Delisted)', price: null, change: null, changePercent: null, link: null},
+        {symbol: 'EXEL', name: 'Exelixis Inc.', price: 40.1, change: -0.35, changePercent: '-0.87%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AEXEL'},
+        {symbol: 'EXXRF', name: 'Excelerate Energy Inc.', price: 98.5, change: 0.00, changePercent: '0.00%', link: 'https://www.tradingview.com/chart/?symbol=OTCPK%3AEXXRF'},
+        {symbol: 'EYPT', name: 'EyePoint Pharmaceuticals Inc.', price: 13.25, change: -0.51, changePercent: '-3.71%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AEYPT'},
+        {symbol: 'FA', name: 'Fleetcor Technologies Inc.', price: 15.32, change: -0.34, changePercent: '-2.17%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AFA'},
+        {symbol: 'FAT', name: 'FAT Brands Inc.', price: 1.91, change: -0.02, changePercent: '-1.04%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AFAT'},
+        {symbol: 'FATBP', name: 'FAT Brands Inc. Preferred', price: 2.43, change: 0.00, changePercent: '0.00%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AFATBP'},
+        {symbol: 'FIG', name: 'Fortress Investment Group LLC', price: 56.81, change: -1.60, changePercent: '-2.74%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AFIG'},
+        {symbol: 'FIZZ', name: 'National Beverage Corp.', price: 38.04, change: -0.53, changePercent: '-1.37%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AFIZZ'},
+        {symbol: 'FMS', name: 'Fresenius Medical Care AG', price: 25.3, change: -0.16, changePercent: '-0.63%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AFMS'},
+        {symbol: 'FOXX', name: 'Foxx Development Corp.', price: 4.94, change: -0.29, changePercent: '-5.54%', link: 'https://www.tradingview.com/chart/?symbol=OTCPK%3AFOXX'},
+        {symbol: 'FPI', name: 'Farmland Partners Inc.', price: 10.93, change: -0.14, changePercent: '-1.26%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AFPI'},
+        {symbol: 'FVRR', name: 'Fiverr International Ltd.', price: 26.67, change: 1.46, changePercent: '5.79%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AFVRR'},
+        {symbol: 'GALT', name: 'Galectin Therapeutics Inc.', price: 4.8, change: 0.16, changePercent: '3.45%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AGALT'},
+        {symbol: 'GB', name: 'Global Blue Group Holding AG', price: 7.49, change: 0.01, changePercent: '0.13%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AGB'},
+        {symbol: 'GCT', name: 'GigaCloud Technology Inc.', price: 29.56, change: 0.44, changePercent: '1.51%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AGCT'},
+        {symbol: 'GDRX', name: 'GoodRx Holdings Inc.', price: 4.13, change: -0.10, changePercent: '-2.36%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AGDRX'},
+        {symbol: 'GETY', name: 'Getty Images Holdings Inc.', price: 2.07, change: 0.03, changePercent: '1.47%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AGETY'},
+        {symbol: 'GLAD', name: 'Gladstone Investment Corp.', price: 23.62, change: 0.05, changePercent: '0.21%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AGLAD'},
+        {symbol: 'GLCNF', name: 'Glucotrack Inc.', price: 4.2295, change: 0.0595, changePercent: '1.43%', link: 'https://www.tradingview.com/chart/?symbol=OTCPK%3AGLCNF'},
+        {symbol: 'GLNCY', name: 'Glencore PLC', price: 8.35, change: 0.07, changePercent: '0.85%', link: 'https://www.tradingview.com/chart/?symbol=OTCPK%3AGLNCY'},
+        {symbol: 'GME', name: 'GameStop Corp.', price: 26.08, change: 0.20, changePercent: '0.77%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AGME'},
+        {symbol: 'GNS', name: 'Genius Group Ltd.', price: 0.96, change: -0.0196, changePercent: '-2.00%', link: 'https://www.tradingview.com/chart/?symbol=NYSEAMERICAN%3AGNS'},
+        {symbol: 'GRAL', name: 'Crural Holdings Inc.', price: 41.65, change: 2.06, changePercent: '5.20%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AGRAL'},
+        {symbol: 'HBI', name: 'Hanesbrands Inc.', price: 6.44, change: 0.15, changePercent: '2.38%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AHBI'},
+        {symbol: 'HIMS', name: 'Hims & Hers Health Inc.', price: 57.82, change: 1.62, changePercent: '2.88%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AHIMS'},
+        {symbol: 'HLN', name: 'Haleon PLC', price: 9.16, change: -0.08, changePercent: '-0.87%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AHLN'},
+        {symbol: 'HOFV', name: 'Hall of Fame Resort & Entertainment Co.', price: 0.665, change: -0.055, changePercent: '-7.64%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AHOFV'},
+        {symbol: 'HOLO', name: 'MicroCloud Hologram Inc.', price: 5.21, change: -0.40, changePercent: '-7.13%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AHOLO'},
+        {symbol: 'HOOD', name: 'Robinhood Markets Inc.', price: 124.78, change: 3.87, changePercent: '3.20%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AHOOD'},
+        {symbol: 'HOTH', name: 'Hoth Therapeutics Inc.', price: 1.8, change: -0.12, changePercent: '-6.25%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AHOTH'},
+        {symbol: 'HRI', name: 'Herc Holdings Inc.', price: 119.1, change: -9.16, changePercent: '-7.14%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AHRI'},
+        {symbol: 'HTGC', name: 'Hercules Capital Inc.', price: 19.52, change: 0.17, changePercent: '0.88%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AHTGC'},
+        {symbol: 'HTZ', name: 'Hertz Global Holdings Inc.', price: 6.8, change: 0.06, changePercent: '0.89%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AHTZ'},
+        {symbol: 'HUMA', name: 'Humacyte Inc.', price: 1.86, change: 0.07, changePercent: '3.91%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AHUMA'},
+        {symbol: 'HUT', name: 'Hut 8 Mining Corp.', price: 36.24, change: -1.14, changePercent: '-3.05%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AHUT'},
+        {symbol: 'HYPD', name: 'Hyperscale Data Inc.', price: 11.28, change: -1.00, changePercent: '-8.14%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AHYPD'},
+        {symbol: 'IDRSF', name: 'iDrilling Solutions Ltd.', price: 3.3, change: -0.04, changePercent: '-1.20%', link: 'https://www.tradingview.com/chart/?symbol=OTCPK%3AIDRSF'},
+        {symbol: 'ILLR', name: 'Illustrative DNA Inc.', price: 1.22, change: 0.00, changePercent: '0.00%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AILLR'},
+        {symbol: 'IMTX', name: 'Immuneering Corp.', price: 6.7, change: 0.09, changePercent: '1.36%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AIMTX'},
+        {symbol: 'IMVT', name: 'Immunovant Inc.', price: 14.78, change: -0.62, changePercent: '-4.03%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AIMVT'},
+        {symbol: 'INCY', name: 'Incyte Corp.', price: 86.53, change: 0.53, changePercent: '0.62%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AINCY'},
+        {symbol: 'INGM', name: 'Ingermar Corp.', price: 21.02, change: -0.26, changePercent: '-1.22%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AINGM'},
+        {symbol: 'INM', name: 'InMed Pharmaceuticals Inc.', price: 2.29, change: -0.07, changePercent: '-2.97%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AINM'},
+        {symbol: 'INMB', name: 'INmune Bio Inc.', price: 1.9, change: -0.07, changePercent: '-3.55%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AINMB'},
+        {symbol: 'INVZ', name: 'Innoviz Technologies Ltd.', price: 1.99, change: 0.02, changePercent: '1.02%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AINVZ'},
+        {symbol: 'IONQ', name: 'IonQ Inc.', price: 70.41, change: 3.60, changePercent: '5.39%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AIONQ'},
+        {symbol: 'IRD', name: 'Ireland Inc.', price: 1.52, change: 0.03, changePercent: '2.01%', link: 'https://www.tradingview.com/chart/?symbol=OTCPK%3AIRD'},
+        {symbol: 'ITCI', name: 'Intra-Cellular Therapies Inc.', price: null, change: null, changePercent: null, link: null},
+        {symbol: 'ITOS', name: 'iTeos Therapeutics Inc.', price: 10.15, change: 0.02, changePercent: '0.20%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AITOS'},
+        {symbol: 'IVVD', name: 'Invivyd Inc.', price: 1.22, change: -0.03, changePercent: '-2.40%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AIVVD'},
+        {symbol: 'JD', name: 'JD.com Inc.', price: 35.1, change: -0.28, changePercent: '-0.79%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AJD'},
+        {symbol: 'JFIN', name: 'Jindal Financial Inc.', price: 11, change: -0.16, changePercent: '-1.43%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AJFIN'},
+        {symbol: 'JOBY', name: 'Joby Aviation Inc.', price: 16.58, change: 1.95, changePercent: '13.33%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AJOBY'},
+        {symbol: 'JSAIY', name: 'JD Sports Fashion PLC', price: 17.7703, change: -0.0097, changePercent: '-0.05%', link: 'https://www.tradingview.com/chart/?symbol=OTCPK%3AJSAIY'},
+        {symbol: 'JTAI', name: 'JET.AI Inc.', price: 3.36, change: 0.02, changePercent: '0.60%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AJTAI'},
+        {symbol: 'KAPA', name: 'KapStone Acquisition Corp.', price: 1.22, change: -0.12, changePercent: '-8.96%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AKAPA'},
+        {symbol: 'KHC', name: 'Kraft Heinz Co.', price: 26.42, change: 0.34, changePercent: '1.30%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AKHC'},
+        {symbol: 'KLG', name: 'WK Kellogg Co.', price: 23, change: 0.02, changePercent: '0.09%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AKLG'},
+        {symbol: 'KNSA', name: 'Kiniksa Pharmaceuticals Ltd.', price: 35.42, change: -0.50, changePercent: '-1.39%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AKNSA'},
+        {symbol: 'KOSS', name: 'Koss Corp.', price: 5.67, change: -0.10, changePercent: '-1.73%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AKOSS'},
+        {symbol: 'KR', name: 'Kroger Co.', price: 65.58, change: -0.41, changePercent: '-0.62%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AKR'},
+        {symbol: 'KROS', name: 'Keros Therapeutics Inc.', price: 15.56, change: -0.48, changePercent: '-2.99%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AKROS'},
+        {symbol: 'KURA', name: 'Kura Oncology Inc.', price: 8.25, change: -0.19, changePercent: '-2.25%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AKURA'},
+        {symbol: 'KVSA', name: 'KVSA Acquisition Corp.', price: null, change: null, changePercent: null, link: null},
+        {symbol: 'KVUE', name: 'Kenvue Inc.', price: 18.34, change: 0.24, changePercent: '1.33%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AKVUE'},
+        {symbol: 'KYMR', name: 'Kymera Therapeutics Inc.', price: 49.13, change: -2.03, changePercent: '-3.97%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AKYMR'},
+        {symbol: 'KYTX', name: 'Kyber Technologies Inc.', price: 5.8, change: 0.79, changePercent: '15.77%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AKYTX'},
+        {symbol: 'KZIA', name: 'Kazia Therapeutics Ltd.', price: 7.76, change: 0.03, changePercent: '0.39%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AKZIA'},
+        {symbol: 'LAC', name: 'Lithium Americas Corp.', price: 3.25, change: 0.03, changePercent: '0.93%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ALAC'},
+        {symbol: 'LAES', name: 'SEALSQ Corp.', price: 4.29, change: 0.68, changePercent: '18.84%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ALAES'},
+        {symbol: 'LAZR', name: 'Luminar Technologies Inc.', price: 2.28, change: -0.03, changePercent: '-1.30%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ALAZR'},
+        {symbol: 'LCID', name: 'Lucid Group Inc.', price: 21.1, change: 0.60, changePercent: '2.93%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ALCID'},
+        {symbol: 'LCUT', name: 'Leatherback Ltd.', price: 3.82, change: -0.135, changePercent: '-3.41%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ALCUT'},
+        {symbol: 'LEAT', name: 'Leatt Corp.', price: 12.67, change: -0.08, changePercent: '-0.63%', link: 'https://www.tradingview.com/chart/?symbol=OTCPK%3ALEAT'},
+        {symbol: 'LINE', name: 'Lineage Inc.', price: 40.38, change: -0.11, changePercent: '-0.27%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ALINE'},
+        {symbol: 'LIPO', name: 'Lipella Pharmaceuticals Inc.', price: 0.57, change: -0.07, changePercent: '-10.94%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ALIPO'},
+        {symbol: 'LITB', name: 'Lifetime Brands Inc.', price: 1.9913, change: -0.0487, changePercent: '-2.39%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ALITB'},
+        {symbol: 'LKNCY', name: 'Lake Resources NL', price: 38.31, change: -0.52, changePercent: '-1.34%', link: 'https://www.tradingview.com/chart/?symbol=OTCPK%3ALKNCY'},
+        {symbol: 'LMND', name: 'Lemonade Inc.', price: 60.96, change: 3.66, changePercent: '6.39%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ALMND'},
+        {symbol: 'LQDA', name: 'Liquidia Corp.', price: 23.78, change: -0.89, changePercent: '-3.61%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ALQDA'},
+        {symbol: 'LSF', name: 'Lakeshore Acquisition II Corp.', price: 6.1, change: 0.14, changePercent: '2.35%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ALSF'},
+        {symbol: 'LSXMA', name: 'Liberty Media Corp. (Series A)', price: null, change: null, changePercent: null, link: null},
+        {symbol: 'LTH', name: 'Lifetime Brands Inc.', price: 27.83, change: -0.43, changePercent: '-1.52%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ALTH'},
+        {symbol: 'MAC', name: 'Macerich Co.', price: 17.44, change: -0.31, changePercent: '-1.75%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AMAC'},
+        {symbol: 'MAIN', name: 'Main Street Capital Corp.', price: 65.78, change: -0.35, changePercent: '-0.53%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AMAIN'},
+        {symbol: 'MARA', name: 'Marathon Digital Holdings Inc.', price: 18.29, change: -0.21, changePercent: '-1.14%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AMARA'},
+        {symbol: 'MB', name: '51job Inc.', price: 9.79, change: 0.39, changePercent: '4.15%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AMB'},
+        {symbol: 'MBRX', name: 'Moleculin Biotech Inc.', price: 0.4027, change: -0.0093, changePercent: '-2.26%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AMBRX'},
+        {symbol: 'MDWD', name: 'MediWound Ltd.', price: 16.98, change: -0.27, changePercent: '-1.57%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AMDWD'},
+        {symbol: 'MGX', name: 'Metalpha Technology Holding Ltd.', price: 2.05, change: -0.09, changePercent: '-4.21%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AMGX'},
+        {symbol: 'MLGO', name: 'MicroAlgo Inc.', price: 10.84, change: -1.27, changePercent: '-10.49%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AMLGO'},
+        {symbol: 'MNKD', name: 'MannKind Corp.', price: 5.43, change: -0.18, changePercent: '-3.21%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AMNKD'},
+        {symbol: 'MNST', name: 'Monster Beverage Corp.', price: 64.13, change: -0.51, changePercent: '-0.79%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AMNST'},
+        {symbol: 'MO', name: 'Altria Group Inc.', price: 64.89, change: 0.95, changePercent: '1.49%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AMO'},
+        {symbol: 'MSGE', name: 'Madison Square Garden Entertainment Corp.', price: 45.15, change: -0.77, changePercent: '-1.68%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AMSGE'},
+        {symbol: 'MYNZ', name: 'Minyzong Inc.', price: 1.61, change: -0.04, changePercent: '-2.42%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AMYNZ'},
+        {symbol: 'MYSE', name: 'My Size Inc.', price: 2.15, change: -0.01, changePercent: '-0.46%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AMYSE'},
+        {symbol: 'NAKA', name: 'Nakamoto Holdings Inc.', price: 1.4, change: -0.09, changePercent: '-6.04%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ANAKA'},
+        {symbol: 'NBIS', name: 'Nebius Group NV', price: 99.31, change: 5.19, changePercent: '5.51%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ANBIS'},
+        {symbol: 'NERV', name: 'Minerva Neurosciences Inc.', price: 2.03, change: -0.03, changePercent: '-1.46%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ANERV'},
+        {symbol: 'NEWT', name: 'NewtekOne Inc.', price: 12.3, change: -0.23, changePercent: '-1.84%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ANEWT'},
+        {symbol: 'NGENF', name: 'Negative Nugenics Inc.', price: 2.58, change: -0.05, changePercent: '-1.90%', link: 'https://www.tradingview.com/chart/?symbol=OTCPK%3ANGENF'},
+        {symbol: 'NIO', name: 'NIO Inc.', price: 7.37, change: 0.00, changePercent: '0.00%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ANIO'},
+        {symbol: 'NKTR', name: 'Nektar Therapeutics', price: 55.14, change: -3.62, changePercent: '-6.16%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ANKTR'},
+        {symbol: 'NNE', name: 'Nano Nuclear Energy Inc.', price: 46.31, change: 8.10, changePercent: '21.20%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ANNE'},
+        {symbol: 'NRXP', name: 'NRx Pharmaceuticals Inc.', price: 2.97, change: -0.01, changePercent: '-0.34%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ANRXP'},
+        {symbol: 'NTWK', name: 'NetTalk.com Inc.', price: 4.57, change: -0.53, changePercent: '-10.39%', link: 'https://www.tradingview.com/chart/?symbol=OTCPK%3ANTWK'},
+        {symbol: 'NU', name: 'Nu Holdings Ltd.', price: 16.17, change: 0.18, changePercent: '1.13%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ANU'},
+        {symbol: 'NURO', name: 'Nuro Inc.', price: null, change: null, changePercent: null, link: null},
+        {symbol: 'NVAX', name: 'Novavax Inc.', price: 8.71, change: 0.18, changePercent: '2.11%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ANVAX'},
+        {symbol: 'NVO', name: 'Novo Nordisk A/S', price: 61.4, change: -0.45, changePercent: '-0.73%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ANVO'},
+        {symbol: 'NVST', name: 'Envista Holdings Corp.', price: 20.93, change: -0.10, changePercent: '-0.48%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ANVST'},
+        {symbol: 'NVTS', name: 'Navitas Semiconductor Corp.', price: 7.01, change: 0.28, changePercent: '4.16%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ANVTS'},
+        {symbol: 'NWG', name: 'NatWest Group PLC', price: 13.89, change: -0.44, changePercent: '-3.07%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ANWG'},
+        {symbol: 'OGN', name: 'Organon & Co.', price: 10.45, change: -0.40, changePercent: '-3.69%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AOGN'},
+        {symbol: 'OKLO', name: 'Oklo Inc.', price: 135.23, change: 30.26, changePercent: '28.83%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AOKLO'},
+        {symbol: 'OPHLY', name: 'Ophlyra Inc.', price: 3.8, change: -0.03, changePercent: '-0.78%', link: 'https://www.tradingview.com/chart/?symbol=OTCPK%3AOPHLY'},
+        {symbol: 'OPY', name: 'Opportunity Financial LLC', price: 78.17, change: -1.68, changePercent: '-2.10%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AOPY'},
+        {symbol: 'ORC', name: 'Orchid Island Capital Inc.', price: 7, change: -0.08, changePercent: '-1.13%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AORC'},
+        {symbol: 'ORMP', name: 'Oramed Pharmaceuticals Inc.', price: 2.34, change: -0.10, changePercent: '-4.10%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AORMP'},
+        {symbol: 'OUST', name: 'Ouster Inc.', price: 34.66, change: -0.06, changePercent: '-0.17%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AOUST'},
+        {symbol: 'OVID', name: 'Ovid Therapeutics Inc.', price: 1.21, change: -0.01, changePercent: '-0.82%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AOVID'},
+        {symbol: 'OXY', name: 'Occidental Petroleum Corp.', price: 46.1, change: -1.26, changePercent: '-2.66%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AOXY'},
+        {symbol: 'PASG', name: 'Passage Bio Inc.', price: 7.17, change: -0.38, changePercent: '-5.03%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3APASG'},
+        {symbol: 'PBH', name: 'Precision BioSciences Inc.', price: 63.1, change: -1.00, changePercent: '-1.56%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3APBH'},
+        {symbol: 'PFE', name: 'Pfizer Inc.', price: 24.03, change: -0.12, changePercent: '-0.50%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3APFE'},
+        {symbol: 'PGEN', name: 'Precigen Inc.', price: 3.75, change: -0.05, changePercent: '-1.32%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3APGEN'},
+        {symbol: 'PHAT', name: 'Phathom Pharmaceuticals Inc.', price: 11.21, change: -0.54, changePercent: '-4.60%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3APHAT'},
+        {symbol: 'PHIO', name: 'Phoenix Biotech Acquisition Corp.', price: 2.07, change: -0.04, changePercent: '-1.90%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3APHIO'},
+        {symbol: 'PL', name: 'Planet Labs PBC', price: 11.11, change: 0.50, changePercent: '4.71%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3APL'},
+        {symbol: 'PLTR', name: 'Palantir Technologies Inc.', price: 182.39, change: 5.42, changePercent: '3.06%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3APLTR'},
+        {symbol: 'PODD', name: 'Insulet Corp.', price: 330.84, change: -2.67, changePercent: '-0.80%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3APODD'},
+        {symbol: 'POWW', name: 'AMMO Inc.', price: 1.44, change: 0.01, changePercent: '0.70%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3APOWW'},
+        {symbol: 'PRDSF', name: 'Prednisone Pharmaceuticals Inc.', price: 5.78, change: -0.02, changePercent: '-0.34%', link: 'https://www.tradingview.com/chart/?symbol=OTCPK%3APRDSF'},
+        {symbol: 'PROF', name: 'Profire Energy Inc.', price: 4.34, change: 0.21, changePercent: '5.08%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3APROF'},
+        {symbol: 'PSEC', name: 'Prospect Capital Corp.', price: 2.66, change: -0.01, changePercent: '-0.37%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3APSEC'},
+        {symbol: 'PSTV', name: 'Plus Therapeutics Inc.', price: 0.4156, change: -0.0155, changePercent: '-3.60%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3APSTV'},
+        {symbol: 'PTON', name: 'Peloton Interactive Inc.', price: 8.27, change: 0.34, changePercent: '4.29%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3APTON'},
+        {symbol: 'QBTS', name: 'D-Wave Quantum Inc.', price: 26.88, change: 2.86, changePercent: '11.91%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AQBTS'},
+        {symbol: 'QMCO', name: 'Quantum Corp.', price: 11.88, change: 3.43, changePercent: '40.59%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AQMCO'},
+        {symbol: 'QQQY', name: 'Defiance Nasdaq-100 Enhanced Options Income ETF', price: 25.73, change: 0.11, changePercent: '0.43%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AQQQY'},
+        {symbol: 'QSI', name: 'Quantum BioPharma Ltd.', price: 1.5, change: -0.03, changePercent: '-1.96%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3AQSI'},
+        {symbol: 'QUBT', name: 'Quantum Computing Inc.', price: 23.27, change: 4.92, changePercent: '26.81%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AQUBT'},
+        {symbol: 'RDY', name: "Dr. Reddy's Laboratories Ltd.", price: 14.87, change: 0.04, changePercent: '0.27%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ARDY'},
+        {symbol: 'REKR', name: 'Rekor Systems Inc.', price: 1.79, change: 0.16, changePercent: '9.82%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AREKR'},
+        {symbol: 'RERE', name: 'Allied Gaming & Entertainment Inc.', price: 4.2, change: -0.08, changePercent: '-1.87%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ARERE'},
+        {symbol: 'RGNX', name: 'REGENXBIO Inc.', price: 8.89, change: -0.47, changePercent: '-5.02%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ARGNX'},
+        {symbol: 'RGTI', name: 'Rigetti Computing Inc.', price: 28.52, change: 3.78, changePercent: '15.28%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ARGTI'},
+        {symbol: 'RIOT', name: 'Riot Platforms Inc.', price: 17.46, change: -0.05, changePercent: '-0.29%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ARIOT'},
+        {symbol: 'RITM', name: 'Rithm Capital Corp.', price: 12.11, change: -0.18, changePercent: '-1.46%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ARITM'},
+        {symbol: 'RIVN', name: 'Rivian Automotive Inc.', price: 14.38, change: -0.30, changePercent: '-2.04%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ARIVN'},
+        {symbol: 'RKLB', name: 'Rocket Lab USA Inc.', price: 47.79, change: 0.61, changePercent: '1.29%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ARKLB'},
+        {symbol: 'RKUNY', name: 'Rockwell Automation Inc.', price: 6.68, change: -0.08, changePercent: '-1.18%', link: 'https://www.tradingview.com/chart/?symbol=OTCPK%3ARKUNY'},
+        {symbol: 'ROIV', name: 'Roivant Sciences Ltd.', price: 15.04, change: -0.05, changePercent: '-0.33%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AROIV'},
+        {symbol: 'ROKU', name: 'Roku Inc.', price: 101.78, change: 2.62, changePercent: '2.64%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3AROKU'},
+        {symbol: 'RPRX', name: 'Royalty Pharma PLC', price: 36.24, change: 0.51, changePercent: '1.43%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ARPRX'},
+        {symbol: 'RUM', name: 'Rumble Inc.', price: 7.69, change: -0.06, changePercent: '-0.77%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ARUM'},
+        {symbol: 'RVPH', name: 'Reviva Pharmaceuticals Holdings Inc.', price: 0.2666, change: -0.1528, changePercent: '-36.43%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ARVPH'},
+        {symbol: 'SAGE', name: 'Sage Therapeutics Inc.', price: 8.68, change: 0.96, changePercent: '12.44%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ASAGE'},
+        {symbol: 'SANA', name: 'Sana Biotechnology Inc.', price: 3.09, change: -0.20, changePercent: '-6.08%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ASANA'},
+        {symbol: 'SBEV', name: 'Splash Beverage Group Inc.', price: 2.19, change: -0.07, changePercent: '-3.10%', link: 'https://www.tradingview.com/chart/?symbol=NYSEAMERICAN%3ASBEV'},
+        {symbol: 'SBGI', name: 'Sinclair Inc.', price: 14.13, change: -0.235, changePercent: '-1.64%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ASBGI'},
+        {symbol: 'SBH', name: 'Salem Media Group Inc.', price: 15.51, change: -0.05, changePercent: '-0.32%', link: 'https://www.tradingview.com/chart/?symbol=NYSE%3ASBH'},
+        {symbol: 'SBUX', name: 'Starbucks Corp.', price: 84.56, change: -0.12, changePercent: '-0.14%', link: 'https://www.tradingview.com/chart/?symbol=NASDAQ%3ASBUX'}
+    ];
+
+    let currentSort = {
+        column: 'symbol',
+        direction: 'asc'
+    };
+
+    function renderTable(data) {
+        const tableBody = document.getElementById('tableBody');
+        tableBody.innerHTML = ''; // Clear existing rows
+
+        for (const stock of data) {
+            const row = document.createElement('tr');
+
+            // Symbol
+            const symbolCell = document.createElement('td');
+            if (stock.link) {
+                symbolCell.innerHTML = `<a href="${stock.link}" target="_blank">${stock.symbol}</a>`;
+            } else {
+                symbolCell.textContent = stock.symbol;
+            }
+            row.appendChild(symbolCell);
+
+            // Name
+            const nameCell = document.createElement('td');
+            nameCell.textContent = stock.name;
+            row.appendChild(nameCell);
+
+            // Price
+            const priceCell = document.createElement('td');
+            priceCell.textContent = stock.price !== null ? `$${stock.price.toFixed(2)}` : 'N/A';
+            row.appendChild(priceCell);
+
+            // Change
+            const changeCell = document.createElement('td');
+            if (stock.change !== null) {
+                changeCell.textContent = stock.change.toFixed(2);
+                changeCell.className = stock.change > 0 ? 'positive' : (stock.change < 0 ? 'negative' : 'neutral');
+            } else {
+                changeCell.textContent = 'N/A';
+                changeCell.className = 'neutral';
+            }
+            row.appendChild(changeCell);
+
+            // Change Percent
+            const changePercentCell = document.createElement('td');
+            if (stock.changePercent !== null) {
+                changePercentCell.textContent = stock.changePercent;
+                // Use the 'change' value for coloring consistency
+                changePercentCell.className = stock.change > 0 ? 'positive' : (stock.change < 0 ? 'negative' : 'neutral');
+            } else {
+                changePercentCell.textContent = 'N/A';
+                changePercentCell.className = 'neutral';
+            }
+            row.appendChild(changePercentCell);
+
+            tableBody.appendChild(row);
+        }
+    }
+
+    function filterTable() {
+        const input = document.getElementById('searchInput');
+        const filter = input.value.toUpperCase();
+        
+        const filteredData = tableData.filter(stock => {
+            return stock.symbol.toUpperCase().includes(filter) || stock.name.toUpperCase().includes(filter);
+        });
+
+        renderTable(filteredData);
+    }
+    
+    function sortTable(column) {
+        // Toggle direction if the same column is clicked again
+        if (currentSort.column === column) {
+            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+            currentSort.column = column;
+            currentSort.direction = 'asc';
+        }
+
+        // Sort data
+        tableData.sort((a, b) => {
+            let valA = a[column];
+            let valB = b[column];
+
+            // Handle numeric sorting for price, change, and changePercent
+            const numericColumns = ['price', 'change', 'changePercent'];
+            if (numericColumns.includes(column)) {
+                valA = (valA === null) ? -Infinity : parseFloat(String(valA).replace('%',''));
+                valB = (valB === null) ? -Infinity : parseFloat(String(valB).replace('%',''));
+            } else {
+                // String sorting for symbol and name
+                valA = String(valA).toLowerCase();
+                valB = String(valB).toLowerCase();
+            }
+
+            if (valA < valB) {
+                return currentSort.direction === 'asc' ? -1 : 1;
+            }
+            if (valA > valB) {
+                return currentSort.direction === 'asc' ? 1 : -1;
+            }
+            return 0;
+        });
+        
+        // Update header styles
+        document.querySelectorAll('#stockTable th').forEach(th => {
+            th.classList.remove('sort-asc', 'sort-desc');
+        });
+        document.querySelector(`#stockTable th[onclick="sortTable('${column}')"]`).classList.add(`sort-${currentSort.direction}`);
+
+
+        // Re-render the table with sorted data and current filter
+        filterTable();
+    }
+
+    // Initial render of the full table
+    document.addEventListener('DOMContentLoaded', () => {
+        sortTable(currentSort.column); // Perform initial sort
+    });
+
+</script>
+
 </body>
 </html>
-
