@@ -1,7 +1,7 @@
-// This is a Vercel Serverless Function.
+// This is a Vercel Serverless Function that uses Node.js's built-in 'https' module.
+// This version has NO external dependencies and does not need a package.json file.
 
-// Use the compatible 'require' syntax for node-fetch
-const fetch = require('node-fetch');
+const https = require('https');
 
 // --- 1. CONFIGURATION ---
 const API_KEY = process.env.ALPHA_VANTAGE_API_KEY;
@@ -16,9 +16,20 @@ let cachedData = {
     timestamp: 0,
     stocks: []
 };
-const CACHE_DURATION_MS = 12 * 60 * 60 * 1000;
+const CACHE_DURATION_MS = 12 * 60 * 60 * 1000; // 12 hours
 
 // --- 3. CORE LOGIC ---
+// Helper function to make an HTTPS request
+function fetch(url) {
+    return new Promise((resolve, reject) => {
+        https.get(url, (res) => {
+            let data = '';
+            res.on('data', (chunk) => { data += chunk; });
+            res.on('end', () => resolve(JSON.parse(data)));
+        }).on('error', (err) => reject(err));
+    });
+}
+
 async function fetchStockData() {
     console.log("Attempting to fetch fresh stock data...");
     if (!API_KEY) {
@@ -37,8 +48,7 @@ async function fetchStockData() {
     for (const symbol of SYMBOLS) {
         try {
             const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${API_KEY}`;
-            const response = await fetch(url);
-            const data = await response.json();
+            const data = await fetch(url);
             
             const quote = data['Global Quote'];
             if (quote && quote['01. symbol']) {
@@ -76,6 +86,7 @@ module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET');
 
     const now = Date.now();
+    // Fetch new data if cache is old or empty
     if (now - cachedData.timestamp > CACHE_DURATION_MS || cachedData.stocks.length === 0) {
         await fetchStockData();
     } else {
