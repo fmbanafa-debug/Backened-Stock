@@ -1,8 +1,7 @@
-// This is a Vercel Serverless Function. 
-// Vercel automatically runs this code when you access the URL /api/stocks.
+// This is a Vercel Serverless Function.
 
-// CORRECTED: 'node-fetch' needs to be imported differently.
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+// Use the compatible 'require' syntax for node-fetch
+const fetch = require('node-fetch');
 
 // --- 1. CONFIGURATION ---
 const API_KEY = process.env.ALPHA_VANTAGE_API_KEY;
@@ -57,8 +56,7 @@ async function fetchStockData() {
         } catch (error) {
             console.error(`Error fetching ${symbol}:`, error);
         }
-        // Shorter delay for the test list
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 sec between calls
     }
     
     if (fetchedStocks.length === 0) {
