@@ -1,7 +1,8 @@
 // This is a Vercel Serverless Function. 
 // Vercel automatically runs this code when you access the URL /api/stocks.
 
-const fetch = require('node-fetch');
+// CORRECTED: 'node-fetch' needs to be imported differently.
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 // --- 1. CONFIGURATION ---
 const API_KEY = process.env.ALPHA_VANTAGE_API_KEY;
@@ -49,7 +50,6 @@ async function fetchStockData() {
                     changePercent: quote['10. change percent'], link: `https://www.tradingview.com/chart/?symbol=NASDAQ%3A${quote['01. symbol']}`
                 });
             } else {
-                // Log Alpha Vantage's response if it's not a valid quote
                 console.warn(`Could not get quote for ${symbol}. API Response:`, JSON.stringify(data));
                 if (data.Note) { console.warn("This may be an API rate limit issue."); }
                 if (data["Error Message"]) { console.warn("This may be an invalid API key or symbol issue."); }
@@ -57,11 +57,12 @@ async function fetchStockData() {
         } catch (error) {
             console.error(`Error fetching ${symbol}:`, error);
         }
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Shorter delay for the test list
+        await new Promise(resolve => setTimeout(resolve, 500));
     }
     
     if (fetchedStocks.length === 0) {
-        console.error("Warning: Finished fetching, but the stock list is empty. This usually indicates a problem with the API key or reaching the API limit.");
+        console.error("Warning: Finished fetching, but the stock list is empty. Check API key or rate limits.");
     }
 
     cachedData = {
